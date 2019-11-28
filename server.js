@@ -8,10 +8,12 @@ const app = express();
 //middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
 //require db
 const db = require("./models");
 // routes
 require("./routes/api-routes.js")(app);
+require("./routes/html-routes.js")(app);
 //sync the db
 db.sequelize.sync().then(function() {
     app.listen(PORT, function() {

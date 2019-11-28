@@ -24,9 +24,7 @@ module.exports = function(app) {
     });
     //update a product
     app.put("/api/products/:id", function(req, res) {
-        db.Product.update(req.body, { where: { id: req.params.id } }).then(function(
-            result
-        ) {
+        db.Product.update({ stock_quantity: req.body.units }, { where: { id: req.params.id } }).then(function(result) {
             res.json(result);
         });
     });
