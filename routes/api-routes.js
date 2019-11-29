@@ -36,9 +36,7 @@ module.exports = function(app) {
             console.log(key);
             console.log(req.body[key]);
 
-            db.Product.update({ stock_quantity: req.body[key] }, { where: { id: key } }).then(function(results) {
-                res.json(results);
-            });
+            db.Product.decrement({ stock_quantity: req.body[key] }, { where: { id: key } });
         }
     });
     //remove a product
