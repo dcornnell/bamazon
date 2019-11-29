@@ -1,4 +1,4 @@
-let price = 0;
+let order = {};
 $(document).ready(function() {
     $.get("/api/products", function(data) {
         const products = data;
@@ -17,18 +17,22 @@ $(document).ready(function() {
                 console.log("sorry there arent enough of those for you to order");
             } else {
                 addToOrder(currentProduct, itemQuantity);
-                updateDB(currentProduct, itemQuantity);
             }
         });
     });
+
+    $("#order").on("click", function() {
+        console.log(order);
+        updateDB(order);
+    });
 });
 
-function updateDB(item, units) {
-    console.log(units);
+function updateDB(order) {
+    console.log(order);
     $.ajax({
         method: "PUT",
-        url: `/api/products/${item.id}`,
-        data: { units }
+        url: `/api/products`,
+        data: order
     }).then(function(results) {
         console.log(results);
     });
@@ -36,13 +40,20 @@ function updateDB(item, units) {
 
 //adds items to the order
 function addToOrder(item, units) {
-    price += item.price * units;
-    console.log(price);
+    if (!order[item.id]) {
+        order[item.id] = 0;
+    }
+    order[item.id] += item.stock_quantity - units;
 }
 
 //function for check availablity
 function checkAvailable(item, units) {
-    const quantity = item.stock_quantity;
+    if (!order[item.id]) {
+        order[item.id] = 0;
+    }
+
+    const quantity = item.stock_quantity - order[item.id];
+    console.log(quantity);
 
     if (quantity - units >= 0) {
         return true;
@@ -59,12 +70,17 @@ function displayProduct(data) {
     department: ${data.department_name}
     price: ${data.price}
     quantity: ${data.stock_quantity}
-    </p>
-    
-    <form class="product-form" id=${data.id}>
+    </p>`);
+    if (data.stock_quantity > 0) {
+        product.append(
+            `<form class="product-form" id=${data.id}>
         <input name="quantity" type="textarea">
         <input type="submit" value="add to cart" class="add">
-    </form>`);
+    </form>`
+        );
+    } else {
+        product.append(`<p class="out">sorry this product is unavailable</p>`);
+    }
     product.addClass("product-holder");
 
     $(".products").append(product);

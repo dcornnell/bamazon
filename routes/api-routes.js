@@ -28,6 +28,19 @@ module.exports = function(app) {
             res.json(result);
         });
     });
+
+    //update a db with the incoming order
+
+    app.put("/api/products", function(req, res) {
+        for (let key in req.body) {
+            console.log(key);
+            console.log(req.body[key]);
+
+            db.Product.update({ stock_quantity: req.body[key] }, { where: { id: key } }).then(function(results) {
+                res.json(results);
+            });
+        }
+    });
     //remove a product
     app.delete("/api/products/:id", function(req, res) {
         db.Product.destroy({ where: { id: req.params.id } }).then(function(result) {
