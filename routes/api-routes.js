@@ -33,11 +33,9 @@ module.exports = function(app) {
 
     app.put("/api/products", function(req, res) {
         for (let key in req.body) {
-            console.log(key);
-            console.log(req.body[key]);
-
             db.Product.decrement({ stock_quantity: req.body[key] }, { where: { id: key } });
         }
+        res.end();
     });
     //remove a product
     app.delete("/api/products/:id", function(req, res) {

@@ -1,6 +1,14 @@
 let order = {};
-total = 0;
+let total = 0;
 $(document).ready(function() {
+    runStore();
+});
+
+function runStore() {
+    order = {};
+    total = 0;
+    $(".products").empty();
+    $(".total").text("00.00");
     $.get("/api/products", function(data) {
         const products = data;
         for (let i = 0; i < data.length; i++) {
@@ -11,31 +19,47 @@ $(document).ready(function() {
             event.preventDefault();
 
             const itemQuantity = parseInt($("input[name=quantity]", this).val());
-            const currentProduct = data.find(x => x.id === parseInt(this.id));
+            const currentProduct = products.find(x => x.id === parseInt(this.id));
+            $(`#help-${currentProduct.id}`).empty();
             if (!itemQuantity) {
-                console.log("thats not a number");
+                $(`#help-${currentProduct.id}`).text("please input a valid number");
             } else if (!checkAvailable(currentProduct, itemQuantity)) {
-                console.log("sorry there arent enough of those for you to order");
+                $(`#help-${currentProduct.id}`).text(
+                    "sorry there arent enough of those for you to order"
+                );
             } else {
                 addToTotal(currentProduct, itemQuantity);
                 addToOrder(currentProduct, itemQuantity);
             }
         });
-    });
 
-    $("#order").on("click", function() {
-        updateDB(order);
+        $("#cartbutton").on("click", function() {
+            $("#cart-list").empty();
+            for (let key in order) {
+                const currentProduct = products.find(x => x.id === parseInt(key));
+                const listItem = $("<li>");
+                const addedPrice = order[key] * currentProduct.price;
+                listItem.html(`<b>${currentProduct.product_name}</>: ${addedPrice}`);
+                $("#cart-list").append(listItem);
+            }
+            $("#cartModal").modal("show");
+        });
+        $("#checkout").on("click", function() {
+            $("#cartModal").modal("hide");
+            updateDB(order);
+
+            $("#checkedOutModal").modal("show");
+        });
     });
-});
+}
 
 function updateDB(order) {
-    console.log(order);
     $.ajax({
         method: "PUT",
         url: `/api/products`,
         data: order
     }).then(function(results) {
-        console.log(results);
+        runStore();
     });
 }
 
@@ -43,7 +67,7 @@ function updateDB(order) {
 function addToTotal(item, units) {
     total += Number((item.price * units).toFixed(2));
 
-    $("#total").text(total);
+    $(".total").text(total);
 }
 //adds items to the order
 function addToOrder(item, units) {
@@ -88,19 +112,25 @@ function displayProduct(data) {
 
         <div class="card-body">
             <div class="row">
-                <div class="col-10">
+                <div class="col-9">
                     <h5 class="card-title">QTY: ${data.stock_quantity}</h5>
                     <p class="card-text">Department: ${data.department_name}</p>
                 </div>`;
 
     if (data.stock_quantity > 0) {
-        body += `<div class="col-2">
+        body += `<div class="col-3">
                     <form class="product-form form-group" id=${data.id}>
                         <input class="form-control" name="quantity" type="textarea">
                         <input type="submit" value="add to cart" class="btn btn-primary btn-block">
+                        <p id="help-${data.id}" class="form-text text-muted">
+</p>
                     </form>
+                   
                 </div>
+              
+                
             </div>
+       
         </div>
     </div>`;
     } else {
