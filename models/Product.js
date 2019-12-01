@@ -15,14 +15,8 @@ module.exports = function(sequelize, dataTypes) {
         stock_quantity: {
             type: dataTypes.INTEGER,
             allowNull: false
-        },
-
-        image: {
-            type: dataTypes.STRING,
-            allowNull: true
         }
-
-    })
+    });
 
     return Product;
 };

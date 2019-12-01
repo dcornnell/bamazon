@@ -3,30 +3,36 @@ let total = 0;
 $(document).ready(function() {
     runStore();
 });
-
+// runs the main bulk of the app
 function runStore() {
+    //resets the cart
     order = {};
     total = 0;
     $(".products").empty();
     $(".total").text("00.00");
+    //gets all products in the database
     $.get("/api/products", function(data) {
         const products = data;
         for (let i = 0; i < data.length; i++) {
             displayProduct(data[i]);
         }
-
+        // adds items to the cart
         $(".product-form").on("submit", function() {
             event.preventDefault();
 
             const itemQuantity = parseInt($("input[name=quantity]", this).val());
             const currentProduct = products.find(x => x.id === parseInt(this.id));
             $(`#help-${currentProduct.id}`).empty();
+            // check its the entered value is a number
             if (!itemQuantity) {
                 $(`#help-${currentProduct.id}`).text("please input a valid number");
+                //checks if there are enough of the item
             } else if (!checkAvailable(currentProduct, itemQuantity)) {
                 $(`#help-${currentProduct.id}`).text(
                     "sorry there arent enough of those for you to order"
                 );
+
+                // adds to the total and to the cart
             } else {
                 addToTotal(currentProduct, itemQuantity);
                 addToOrder(currentProduct, itemQuantity);
@@ -35,15 +41,20 @@ function runStore() {
 
         $("#cartbutton").on("click", function() {
             $("#cart-list").empty();
+            //shows totals for items
             for (let key in order) {
-                const currentProduct = products.find(x => x.id === parseInt(key));
-                const listItem = $("<li>");
-                const addedPrice = order[key] * currentProduct.price;
-                listItem.html(`<b>${currentProduct.product_name}</>: ${addedPrice}`);
-                $("#cart-list").append(listItem);
+                if (order[key] > 0) {
+                    const currentProduct = products.find(x => x.id === parseInt(key));
+                    const listItem = $("<li>");
+                    const addedPrice = order[key] * currentProduct.price;
+
+                    listItem.html(`<b>${currentProduct.product_name}</>: ${addedPrice}`);
+                    $("#cart-list").append(listItem);
+                }
             }
             $("#cartModal").modal("show");
         });
+        // updates the database
         $("#checkout").on("click", function() {
             $("#cartModal").modal("hide");
             updateDB(order);
@@ -52,7 +63,7 @@ function runStore() {
         });
     });
 }
-
+// updates the database with the order
 function updateDB(order) {
     $.ajax({
         method: "PUT",
