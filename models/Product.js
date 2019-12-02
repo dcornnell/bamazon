@@ -9,7 +9,7 @@ module.exports = function(sequelize, dataTypes) {
             allowNull: false
         },
         price: {
-            type: dataTypes.INTEGER,
+            type: dataTypes.FLOAT(10, 2),
             allowNull: false
         },
         stock_quantity: {
