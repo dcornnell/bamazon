@@ -15,8 +15,12 @@ const db = require("./models");
 require("./routes/api-routes.js")(app);
 require("./routes/html-routes.js")(app);
 //sync the db
-db.sequelize.sync().then(function() {
-    app.listen(PORT, function() {
-        console.log("server is listening on " + PORT);
+db.sequelize
+    .sync({
+        force: true
+    })
+    .then(function() {
+        app.listen(PORT, function() {
+            console.log("server is listening on " + PORT);
+        });
     });
-});
