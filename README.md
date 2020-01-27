@@ -10,7 +10,10 @@ This app is a shopping app made to practice my skills with Node. Sequelize and D
 
 ## Overview
 
-When the user vistis the site the can "purchase" products by added them to their cart. if they try to add more than are available or there input is invalid they will get an error once. once they are ready to check out the database is updated and the page is refreshed. On the manager side a user can add items, see a list of items that are low on inventory and add items to the inventory.
+When the user vistis the site the can "purchase" products by added them to their cart. if they try to add more than are available or there input is invalid they will get an error once. once they are ready to check out the database is updated and the page is refreshed. On the manager side a user can add items, see a list of items that are low on inventory and add items 
+to the inventory.
+
+![bamazon](https://dcornnell.github.io/Portfolio-2019/assets/images//bamazon.png)
 
 ## Technologies Used
 
